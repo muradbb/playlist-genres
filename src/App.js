@@ -30,7 +30,7 @@ let dummyServerData={
 			name : 'yay songs',
 			songs: [{name: 'cool song', duration:180},
 							{name:'uncool song', duration:120},
-							{name:'nice song', duration:150}]
+							{name:'heh song', duration:150}]
 		}
 
 		]
@@ -75,10 +75,14 @@ class TotalHours extends React.Component{
 
 class Playlist extends React.Component{
 	render(){
+		let playlist=this.props.playlist
 		return(
 		<div style={{width: "15%", display:'inline-block'}}>
-		<h3>Playlist name</h3>
-		<ul><li>Song1</li><li>Song2</li><li>Song3</li></ul>
+		<h3>{playlist.name}</h3>
+		<ul>{playlist.songs.map(song=>
+			<li>{song.name}</li>)
+			}
+		</ul>
 		</div>
 		);
 	}
@@ -106,10 +110,11 @@ class App extends React.Component {
 				  <PlaylistCounter playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
 				  <TotalHours playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
 				  <Search/>
-				  <Playlist/>
-				  <Playlist/>
-				  <Playlist/>
-				  <Playlist/>
+					{
+						this.state.serverData.user.playlists.map(playlists=>
+							<Playlist playlist={playlists}/>
+						)
+					}
 					</div> : <h1>Loading...</h1>}
 			</div>
 		);
