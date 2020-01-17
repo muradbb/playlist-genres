@@ -68,7 +68,9 @@ class TotalHours extends React.Component{
 	render(){
   return(
     <div>
-    <input type="text"/>
+    <input type="text" onKeyUp={event=>
+			this.props.whenTextChange(event.target.value)
+		}/>
     </div>
     );}
 }
@@ -95,7 +97,10 @@ class Playlist extends React.Component{
 class App extends React.Component {
 	constructor(){
 		super()
-		this.state={serverData: {}}
+		this.state={
+			serverData: {},
+			searchString: ''
+		}
 	}
 	componentDidMount(){
 		setTimeout(()=>
@@ -109,9 +114,11 @@ class App extends React.Component {
 					<h1>{this.state.serverData.user.name}'s playlists</h1>
 				  <PlaylistCounter playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
 				  <TotalHours playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
-				  <Search/>
+				  <Search whenTextChange={text=> this.setState({searchString : text})}/>
 					{
-						this.state.serverData.user.playlists.map(playlists=>
+						this.state.serverData.user.playlists.filter(playlists=>
+							playlists.name.toLowerCase().includes(this.state.searchString.toLowerCase())
+						).map(playlists=>
 							<Playlist playlist={playlists}/>
 						)
 					}
