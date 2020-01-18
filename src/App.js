@@ -81,6 +81,7 @@ class Playlist extends React.Component{
 		let playlist=this.props.playlist
 		return(
 		<div style={{width: "15%", display:'inline-block'}}>
+		<img src={playlist.imgageUrl} style={{width:'60px'}}/>
 		<h3>{playlist.name}</h3>
 		<ul>{playlist.songs.map(song=>
 			<li>{song.name}</li>)
@@ -106,6 +107,8 @@ class App extends React.Component {
 	componentDidMount(){
 		let parsed=queryString.parse(window.location.search)
 		let accessToken= parsed.access_token
+		if(!accessToken)
+			return
 		fetch('https://api.spotify.com/v1/me', {
 		 headers: {'Authorization': 'Bearer ' + accessToken}
 	 }).then(response => response.json())
@@ -116,6 +119,7 @@ class App extends React.Component {
 	}).then(response => response.json())
 	.then(data =>this.setState({playlists: data.items.map(item=>({
 		name: item.name,
+		imgageUrl: item.images[0].url,
 		songs: []
 	}))
 		}))
@@ -139,7 +143,9 @@ class App extends React.Component {
 						)
 					}
 					</div> :  <button onClick={() => {
-            window.location = 'http://localhost:8888/login'}
+            window.location = window.location.href.includes('localhost')
+						? 'http://localhost:8888/login'
+						: 'https://playlist-genres-backend.herokuapp.com/login'}
           }>
 					Sign in with Spotify</button>
 				}
