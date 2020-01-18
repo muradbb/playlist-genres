@@ -10,3 +10,6 @@
 [0117/171558.455:ERROR:crash_report_database_win.cc(580)] CreateDirectory C:\Program Files (x86)\Gofat\Reports\Dump: The system cannot find the path specified. (0x3)
 [0117/171558.463:ERROR:registration_protocol_win.cc(84)] TransactNamedPipe: The pipe has been ended. (0x6D)
 [0117/171558.463:ERROR:crash_report_database_win.cc(580)] CreateDirectory C:\Program Files (x86)\Gofat\Reports\Dump: The system cannot find the path specified. (0x3)
+[0118/032218.763:ERROR:crash_report_database_win.cc(580)] CreateDirectory C:\Program Files (x86)\Gofat\Reports\Dump: The system cannot find the path specified. (0x3)
+[0118/032218.773:ERROR:registration_protocol_win.cc(84)] TransactNamedPipe: The pipe has been ended. (0x6D)
+[0118/032218.774:ERROR:crash_report_database_win.cc(580)] CreateDirectory C:\Program Files (x86)\Gofat\Reports\Dump: The system cannot find the path specified. (0x3)

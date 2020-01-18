@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import queryString from 'query-string'
 
 
 
@@ -103,26 +104,45 @@ class App extends React.Component {
 		}
 	}
 	componentDidMount(){
-		setTimeout(()=>
-		this.setState({serverData: dummyServerData}),1000)
+		let parsed=queryString.parse(window.location.search)
+		let accessToken= parsed.access_token
+		fetch('https://api.spotify.com/v1/me', {
+		 headers: {'Authorization': 'Bearer ' + accessToken}
+	 }).then(response => response.json())
+	 .then(data =>this.setState({user:{name: data.display_name}}))
+
+	 fetch('https://api.spotify.com/v1/me/playlists', {
+		headers: {'Authorization': 'Bearer ' + accessToken}
+	}).then(response => response.json())
+	.then(data =>this.setState({playlists: data.items.map(item=>({
+		name: item.name,
+		songs: []
+	}))
+		}))
+
+
 	}
 	render(){
+		let searchedPlaylists = this.state.user && this.state.playlists
+		? this.state.playlists.filter(playlists=>
+			playlists.name.toLowerCase().includes(this.state.searchString.toLowerCase())) : []
 		return (
 			<div className="App">
-			 {this.state.serverData.user ?
+			 {this.state.user ?
 				<div>
-					<h1>{this.state.serverData.user.name}'s playlists</h1>
-				  <PlaylistCounter playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
-				  <TotalHours playlists={this.state.serverData.user && this.state.serverData.user.playlists}/>
+					<h1>{this.state.user.name}'s playlists</h1>
+				  <PlaylistCounter playlists={searchedPlaylists}/>
+				  <TotalHours playlists={searchedPlaylists}/>
 				  <Search whenTextChange={text=> this.setState({searchString : text})}/>
-					{
-						this.state.serverData.user.playlists.filter(playlists=>
-							playlists.name.toLowerCase().includes(this.state.searchString.toLowerCase())
-						).map(playlists=>
+					{		searchedPlaylists.map(playlists=>
 							<Playlist playlist={playlists}/>
 						)
 					}
-					</div> : <h1>Loading...</h1>}
+					</div> :  <button onClick={() => {
+            window.location = 'http://localhost:8888/login'}
+          }>
+					Sign in with Spotify</button>
+				}
 			</div>
 		);
 	}
