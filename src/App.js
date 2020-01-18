@@ -59,7 +59,7 @@ class TotalHours extends React.Component{
 		},0)
 	  return(
 	    <div style={{width: "40%", display: 'inline-block'}}>
-	      <h2>{totalDuration/60} hours</h2>
+	      <h2>{totalDuration/3600} hours</h2>
 	    </div>
 	    );
 		}
@@ -114,35 +114,6 @@ class App extends React.Component {
 	 }).then(response => response.json())
 	 .then(data =>this.setState({user:{name: data.display_name}}))
 
-
-	//  fetch('https://api.spotify.com/v1/me/playlists', {
-	// 	headers: {'Authorization': 'Bearer ' + accessToken}
-	// }).then(response => response.json())
-	// .then(playlistData=>{
-	// 	let playlists=playlistData.items
-	// 	let trackDataPromises=playlists.map(playlist=>{
-	// 		let responsePromise=fetch(playlist.tracks.href, {
-	// 	 headers: {'Authorization': 'Bearer ' + accessToken}
-	//  })
-	//  let trackDataPromise=responsePromise.then(response =>response.json())
-	//  return trackDataPromise
- // })
- // let allTracksDatas=Promise.all(trackDataPromises)
-	//  let playlistsPrmise= allTracksDatas.then(trackDatas =>{
-	// 	 trackDatas.forEach((trackData, i)=>{
-	// 		 playlists[i].trackDatas=trackData.items
-	// 	 })
-	// 	 return playlists
-	//  })
- // 	return playlistsPrmise
- // })
-	// .then(playlists =>this.setState({playlists: playlists.items.map(item=>({
-	// 	name: item.name,
-	// 	imageUrl: item.images[0].url,
-	// 	songs: []
-	// }))
-	// 	}))
-
 	fetch('https://api.spotify.com/v1/me/playlists', {
 		 headers: {'Authorization': 'Bearer ' + accessToken}
 	 }).then(response => response.json())
@@ -184,9 +155,17 @@ class App extends React.Component {
 
 	}
 	render(){
-		let searchedPlaylists = this.state.user && this.state.playlists
-		? this.state.playlists.filter(playlists=>
-			playlists.name.toLowerCase().includes(this.state.searchString.toLowerCase())) : []
+		let searchedBarText=this.state.searchString.toLowerCase()
+		let searchedPlaylists =
+		this.state.user &&
+		this.state.playlists
+		? this.state.playlists.filter(playlists=>{
+			let matchesPlaylist= playlists.name.toLowerCase().includes
+			(searchedBarText)
+			let matchesTrack=playlists.songs.filter(song=> song.name.toLowerCase().includes(searchedBarText))
+			return matchesPlaylist || matchesTrack.length>0
+		})
+	  : []
 		return (
 			<div className="App">
 			 {this.state.user ?
