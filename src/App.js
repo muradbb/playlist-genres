@@ -3,48 +3,32 @@ import logo from './logo.svg';
 import './App.css';
 import queryString from 'query-string'
 
-
-
-let dummyServerData={
-	user:{
-		name: 'Murad',
-		playlists:[
-		{
-			name : 'cool songs',
-			songs: [{name: 'cool song', duration:180},
-							{name:'uncool song', duration:120},
-							{name:'nice song', duration:150}]
-		},
-		{
-			name : 'okay songs',
-			songs: [{name: 'cool song', duration:180},
-							{name:'uncool song', duration:120},
-							{name:'nice song', duration:150}]
-		},
-		{
-			name : 'bad songs',
-			songs: [{name: 'cool song', duration:180},
-							{name:'uncool song', duration:120},
-							{name:'nice song', duration:150}]
-		},
-		{
-			name : 'yay songs',
-			songs: [{name: 'cool song', duration:180},
-							{name:'uncool song', duration:120},
-							{name:'heh song', duration:150}]
-		}
-
-		]
-	}
+let playlistStyle={
+	width: '200px',
+	height:'340px',
+	display:'inline-block',
+	//border: '1px solid green',
+	margin: '20px',
+	'background-color': '#212121'
+}
+let songStyle={
+	color: '#ababab'
 }
 
 
+
+let headerStyle={
+	'background-color': '#212121',
+	'margin': '20px'
+
+
+}
 
 class PlaylistCounter extends React.Component{
 	render(){
   return(
     <div style={{width: "40%", display: 'inline-block'}}>
-      <h2>{this.props.playlists.length} playlists</h2>
+      <h2 style={{color:'#535353', 'margin-left':'5%'}}>Playlists on display: {this.props.playlists.length}</h2>
     </div>
     );}
 }
@@ -52,14 +36,14 @@ class PlaylistCounter extends React.Component{
 class TotalHours extends React.Component{
 	render(){
 		let allSongs=this.props.playlists.reduce((songs,eachPlaylist)=>{
-			return songs.concat(eachPlaylist.songs)
+			return songs.concat(eachPlaylist.allSongs)
 		} ,[])
 		let totalDuration = allSongs.reduce((sum,eachSong)=>{
 			return sum+eachSong.duration
 		},0)
 	  return(
-	    <div style={{width: "40%", display: 'inline-block'}}>
-	      <h2>{totalDuration/3600} hours</h2>
+	    <div style={{width: "40%",display: 'inline-block'}}>
+	      <h2 style={{'text-align': 'right', color:'#535353'}}>{Math.floor(totalDuration/3600)} hours {Math.round(60*((totalDuration/3600)-Math.floor(totalDuration/3600)))} mins</h2>
 	    </div>
 	    );
 		}
@@ -69,9 +53,9 @@ class TotalHours extends React.Component{
 	render(){
   return(
     <div>
-    <input type="text" onKeyUp={event=>
+    <input placeholder="Search for playlists or songs" type="text" onKeyUp={event=>
 			this.props.whenTextChange(event.target.value)
-		}/>
+		} style={{'height': '25px' , 'width': '400px', 'font-size': '20px', 'margin-left': '33%'}} />
     </div>
     );}
 }
@@ -80,11 +64,15 @@ class Playlist extends React.Component{
 	render(){
 		let playlist=this.props.playlist
 		return(
-		<div style={{width: "15%", display:'inline-block'}}>
-		<img src={playlist.imageUrl} style={{width:'60px'}}/>
-		<h3>{playlist.name}</h3>
-		<ul>{playlist.songs.map(song=>
-			<li>{song.name}</li>)
+		<div style={{...playlistStyle}}>
+		<img src={playlist.imageUrl} style={{width:'180px', 'margin-left': '10px', 'margin-top':'10px'}}/>
+		<h3 style={{'text-align': 'center',color:'#fff'}}>{playlist.name}</h3>
+		<ul>
+		{playlist.songs.map(song=>
+			<li style={{color: '#878787','list-style-type':'none'}}>{
+				song.name.length>20
+				? song.name.substr(0, 17).concat("...")
+				: song.name}</li>)
 			}
 		</ul>
 		</div>
@@ -128,26 +116,31 @@ class App extends React.Component {
 			 return trackDataPromise
 		 })
 		 let allTracksDataPromises =
-			 Promise.all(trackDataPromises)
-		 let playlistsPromise = allTracksDataPromises.then(trackDatas => {
-			 trackDatas.forEach((trackData, i) => {
-				 playlists[i].trackDatas = trackData.items
-				 .map(item=>item.track)
-				 .map(trackData=>({
-					 name: trackData.name,
-					 duration: trackData.duration_ms/1000
-				 }))
-			 })
-			 return playlists
-		 })
-		 return playlistsPromise
+					 Promise.all(trackDataPromises)
+				 let playlistsPromise = allTracksDataPromises.then(trackDatas => {
+					 trackDatas.forEach((trackData, i) => {
+						 playlists[i].trackDatas = trackData.items
+						 .map(item=>item.track)
+						 // .map(trackData=>({
+							//  name: trackData.name,
+							//  duration: trackData.duration_ms/1000
+						 // }))
+					 })
+					 return playlists
+				 })
+				 return playlistsPromise
 	 })
 	 .then(playlists => this.setState({
 		 playlists: playlists.map(item => {
 			 return {
 				 name: item.name,
 				 imageUrl: item.images[0].url,
-				 songs: item.trackDatas.slice(0,3)
+				 songs: item.trackDatas.slice(0,3).map(trackData=>({
+					 name: trackData.name,
+					 duration: trackData.duration_ms/1000
+				 })),
+				 allSongs:item.trackDatas.map(trackData=>({
+					 duration: trackData.duration_ms/1000}))
 			 }
 	 })
 	 }))
@@ -170,9 +163,11 @@ class App extends React.Component {
 			<div className="App">
 			 {this.state.user ?
 				<div>
-					<h1>{this.state.user.name}'s playlists</h1>
+				<div style={{...headerStyle}}>
+					<h1 style={{'text-align':'center', color:'#fff'}}>{this.state.user.name}'s playlists</h1>
 				  <PlaylistCounter playlists={searchedPlaylists}/>
 				  <TotalHours playlists={searchedPlaylists}/>
+				</div>
 				  <Search whenTextChange={text=> this.setState({searchString : text})}/>
 					{		searchedPlaylists.map(playlists=>
 							<Playlist playlist={playlists}/>
