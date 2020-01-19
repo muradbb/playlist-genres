@@ -15,7 +15,9 @@ let songStyle={
 	color: '#ababab'
 }
 
+let loginPageStyle={
 
+}
 
 let headerStyle={
 	'background-color': '#212121',
@@ -173,12 +175,22 @@ class App extends React.Component {
 							<Playlist playlist={playlists}/>
 						)
 					}
-					</div> :  <button onClick={() => {
+					</div> : <div style={{}}> <button style={{
+						width: '20%',
+						height: '40px',
+						'border-radius':'18px',
+						'margin-left':'40%',
+						'margin-top': '10%',
+						color: '#1db954',
+						'font-size': '130%'
+					}}
+					onClick={() => {
             window.location = window.location.href.includes('localhost')
 						? 'http://localhost:8888/login'
 						: 'https://playlist-genres-backend.herokuapp.com/login'}
           }>
-					Sign in with Spotify</button>
+					<b>Sign in with spotify</b></button>
+					</div>
 				}
 			</div>
 		);
